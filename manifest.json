@@ -1,0 +1,25 @@
+{
+  "name": "워킹 머니 트래커",
+  "short_name": "머니트래커",
+  "description": "실시간으로 내가 버는 돈을 확인하며 동기부여 받는 앱",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#1e3c72",
+  "theme_color": "#2a5298",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png", 
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["productivity", "finance"],
+  "lang": "ko",
+  "scope": "./"
+}
