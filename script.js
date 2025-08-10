@@ -10,6 +10,7 @@ class IncomeTracker {
         this.initElements();
         this.bindEvents();
         this.updatePerSecondIncome();
+        this.checkUrlParams();
     }
 
     initElements() {
@@ -139,6 +140,24 @@ class IncomeTracker {
         const seconds = totalSeconds % 60;
         
         return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    checkUrlParams() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const wage = urlParams.get('wage');
+        const autostart = urlParams.get('autostart');
+        
+        if (wage) {
+            this.hourlyWageInput.value = wage;
+            this.updatePerSecondIncome();
+            this.updateDisplayHourlyWage();
+            
+            if (autostart === 'true') {
+                setTimeout(() => {
+                    this.start();
+                }, 500);
+            }
+        }
     }
 }
 
