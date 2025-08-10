@@ -229,8 +229,68 @@ button:disabled {
     color: #2d3748;
     font-size: 0.95rem;
     font-weight: 600;
-    margin: 0;
+    margin: 0 0 15px 0;
     opacity: 0.85;
+}
+
+.widget-mode-btn {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.widget-mode-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+}
+
+/* 위젯 모드 스타일 */
+.widget-mode .container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-width: none;
+    width: 100%;
+    height: 100vh;
+    margin: 0;
+    padding: 20px;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #667eea 100%);
+    color: white;
+}
+
+.widget-mode .income-display {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    margin-bottom: 40px;
+}
+
+.widget-mode .input-section,
+.widget-mode .stats,
+.widget-mode .motivation-footer {
+    display: none;
+}
+
+.widget-mode h1 {
+    color: white;
+    margin-bottom: 30px;
+    font-size: 2rem;
+}
+
+.widget-mode .subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 40px;
 }
 
 @media (max-width: 480px) {

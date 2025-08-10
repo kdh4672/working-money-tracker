@@ -11,6 +11,7 @@ class IncomeTracker {
         this.bindEvents();
         this.updatePerSecondIncome();
         this.checkUrlParams();
+        this.initWidgetMode();
     }
 
     initElements() {
@@ -22,6 +23,7 @@ class IncomeTracker {
         this.perSecondIncome = document.getElementById('perSecondIncome');
         this.elapsedTime = document.getElementById('elapsedTime');
         this.displayHourlyWage = document.getElementById('displayHourlyWage');
+        this.widgetModeBtn = document.getElementById('widgetModeBtn');
     }
 
     bindEvents() {
@@ -71,6 +73,9 @@ class IncomeTracker {
         this.stopBtn.disabled = false;
         this.hourlyWageInput.disabled = true;
         
+        // 화면이 꺼지지 않도록 설정
+        this.keepScreenAwake();
+        
         this.animate();
     }
 
@@ -81,6 +86,9 @@ class IncomeTracker {
             cancelAnimationFrame(this.animationId);
             this.animationId = null;
         }
+        
+        // 화면 깨우기 해제
+        this.releaseScreenWake();
         
         this.startBtn.disabled = false;
         this.stopBtn.disabled = true;
@@ -156,6 +164,55 @@ class IncomeTracker {
                 setTimeout(() => {
                     this.start();
                 }, 500);
+            }
+        }
+    }
+
+    // 화면이 꺼지지 않도록 유지
+    async keepScreenAwake() {
+        if ('wakeLock' in navigator) {
+            try {
+                this.wakeLock = await navigator.wakeLock.request('screen');
+                console.log('화면 깨우기 활성화');
+            } catch (err) {
+                console.log('Wake Lock 지원하지 않음:', err);
+            }
+        }
+    }
+
+    // 화면 깨우기 해제
+    releaseScreenWake() {
+        if (this.wakeLock) {
+            this.wakeLock.release();
+            this.wakeLock = null;
+            console.log('화면 깨우기 해제');
+        }
+    }
+
+    // 위젯 모드 초기화
+    initWidgetMode() {
+        if (this.widgetModeBtn) {
+            this.widgetModeBtn.addEventListener('click', () => {
+                this.toggleWidgetMode();
+            });
+        }
+    }
+
+    // 위젯 모드 토글
+    toggleWidgetMode() {
+        document.body.classList.toggle('widget-mode');
+        
+        if (document.body.classList.contains('widget-mode')) {
+            this.widgetModeBtn.textContent = '📱 일반 모드';
+            // 전체화면 요청
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            }
+        } else {
+            this.widgetModeBtn.textContent = '📱 위젯 모드';
+            // 전체화면 해제
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
             }
         }
     }
