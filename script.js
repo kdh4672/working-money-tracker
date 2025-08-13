@@ -31,6 +31,7 @@ class IncomeTracker {
         this.elapsedTime = document.getElementById('elapsedTime');
         this.displayHourlyWage = document.getElementById('displayHourlyWage');
         this.widgetModeBtn = document.getElementById('widgetModeBtn');
+        this.widgetExitBtn = document.getElementById('widgetExitBtn');
         
         // 모드 전환 관련 요소들
         this.hourlyModeBtn = document.getElementById('hourlyModeBtn');
@@ -39,9 +40,9 @@ class IncomeTracker {
         this.salaryModeDiv = document.getElementById('salaryMode');
         
         // 퇴근 메시지 관련 요소들
-        this.incomeLabel = document.getElementById('incomeLabel');
-        this.incomeSubtitle = document.getElementById('incomeSubtitle');
-        this.endOfWorkMessage = document.getElementById('endOfWorkMessage');
+        this.incomeDisplay = document.getElementById('incomeDisplay');
+        this.workingContent = document.getElementById('workingContent');
+        this.celebrationContent = document.getElementById('celebrationContent');
         this.totalDailyEarning = document.getElementById('totalDailyEarning');
     }
 
@@ -266,15 +267,15 @@ class IncomeTracker {
     }
 
     showWorkingUI() {
-        this.incomeLabel.textContent = '지금까지 번 돈';
-        this.incomeSubtitle.style.display = 'block';
-        this.endOfWorkMessage.classList.add('hidden');
+        this.incomeDisplay.classList.remove('celebration');
+        this.workingContent.classList.remove('hidden');
+        this.celebrationContent.classList.add('hidden');
     }
 
     showEndOfWorkUI() {
-        this.incomeLabel.textContent = '오늘 하루 총 수익';
-        this.incomeSubtitle.style.display = 'none';
-        this.endOfWorkMessage.classList.remove('hidden');
+        this.incomeDisplay.classList.add('celebration');
+        this.workingContent.classList.add('hidden');
+        this.celebrationContent.classList.remove('hidden');
         this.totalDailyEarning.textContent = '₩' + this.formatNumber(this.totalEarned);
     }
 
@@ -379,6 +380,12 @@ class IncomeTracker {
                 this.toggleWidgetMode();
             });
         }
+        
+        if (this.widgetExitBtn) {
+            this.widgetExitBtn.addEventListener('click', () => {
+                this.exitWidgetMode();
+            });
+        }
     }
 
     // 위젯 모드 토글
@@ -397,6 +404,17 @@ class IncomeTracker {
             if (document.exitFullscreen) {
                 document.exitFullscreen();
             }
+        }
+    }
+
+    // 위젯 모드 종료
+    exitWidgetMode() {
+        document.body.classList.remove('widget-mode');
+        this.widgetModeBtn.textContent = '📱 위젯 모드';
+        
+        // 전체화면 해제
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
         }
     }
 }

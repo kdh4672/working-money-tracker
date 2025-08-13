@@ -289,19 +289,13 @@ button:disabled {
     z-index: 1;
 }
 
-.end-of-work-message {
+.income-display.celebration {
     background: linear-gradient(135deg, #48bb78, #38a169, #2f855a);
     color: white;
-    padding: 40px;
-    border-radius: 18px;
-    margin-bottom: 30px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
     box-shadow: 0 15px 35px rgba(56, 161, 105, 0.3);
 }
 
-.end-of-work-message::before {
+.income-display.celebration::before {
     content: '';
     position: absolute;
     top: -50%;
@@ -310,6 +304,14 @@ button:disabled {
     height: 200%;
     background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
     animation: shimmer 4s linear infinite;
+}
+
+.celebration-content {
+    transition: all 0.5s ease;
+}
+
+.working-content {
+    transition: all 0.5s ease;
 }
 
 .celebration-emoji {
@@ -436,12 +438,18 @@ button:disabled {
     justify-content: center;
     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #667eea 100%);
     color: white;
+    position: relative;
 }
 
 .widget-mode .income-display {
     background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(20px);
     margin-bottom: 40px;
+}
+
+.widget-mode .income-display.celebration {
+    background: rgba(72, 187, 120, 0.2);
+    backdrop-filter: blur(20px);
 }
 
 .widget-mode .input-section,
@@ -459,6 +467,34 @@ button:disabled {
 .widget-mode .subtitle {
     color: rgba(255, 255, 255, 0.9);
     margin-bottom: 40px;
+}
+
+.widget-exit-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 12px 20px;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    display: none;
+}
+
+.widget-mode .widget-exit-btn {
+    display: block;
+}
+
+.widget-exit-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
 @media (max-width: 480px) {
