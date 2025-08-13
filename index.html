@@ -26,11 +26,30 @@
         <p class="subtitle">지금 이 순간에도 당신은 돈을 벌고 있습니다</p>
         
         <div class="input-section">
-            <label for="hourlyWage">시급 (원)</label>
-            <input type="number" id="hourlyWage" placeholder="예: 10000" min="0" step="100">
-            <button id="startBtn">시작</button>
-            <button id="stopBtn" disabled>정지</button>
-            <button id="resetBtn">리셋</button>
+            <div class="input-mode-toggle">
+                <button id="hourlyModeBtn" class="mode-btn active">시급 입력</button>
+                <button id="salaryModeBtn" class="mode-btn">월급 입력</button>
+            </div>
+            
+            <div id="hourlyMode" class="input-mode">
+                <label for="hourlyWage">시급 (원)</label>
+                <input type="number" id="hourlyWage" placeholder="예: 10000" min="0" step="100">
+            </div>
+            
+            <div id="salaryMode" class="input-mode hidden">
+                <label for="monthlySalary">월급 실수령액 (원)</label>
+                <input type="number" id="monthlySalary" placeholder="예: 2500000" min="0" step="10000">
+                
+                <label for="monthlyHours">월 근무시간 (시간)</label>
+                <input type="number" id="monthlyHours" placeholder="176" value="176" min="1" step="1">
+                <div class="hours-info">기본: 월 22일 × 8시간 = 176시간</div>
+            </div>
+            
+            <div class="control-buttons">
+                <button id="startBtn">시작</button>
+                <button id="stopBtn" disabled>정지</button>
+                <button id="resetBtn">리셋</button>
+            </div>
         </div>
         
         <div class="income-display">

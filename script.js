@@ -6,6 +6,7 @@ class IncomeTracker {
         this.animationId = null;
         this.totalEarned = 0;
         this.lastUpdateTime = null;
+        this.inputMode = 'hourly'; // 'hourly' or 'salary'
         
         this.initElements();
         this.bindEvents();
@@ -16,6 +17,8 @@ class IncomeTracker {
 
     initElements() {
         this.hourlyWageInput = document.getElementById('hourlyWage');
+        this.monthlySalaryInput = document.getElementById('monthlySalary');
+        this.monthlyHoursInput = document.getElementById('monthlyHours');
         this.startBtn = document.getElementById('startBtn');
         this.stopBtn = document.getElementById('stopBtn');
         this.resetBtn = document.getElementById('resetBtn');
@@ -24,6 +27,12 @@ class IncomeTracker {
         this.elapsedTime = document.getElementById('elapsedTime');
         this.displayHourlyWage = document.getElementById('displayHourlyWage');
         this.widgetModeBtn = document.getElementById('widgetModeBtn');
+        
+        // 모드 전환 관련 요소들
+        this.hourlyModeBtn = document.getElementById('hourlyModeBtn');
+        this.salaryModeBtn = document.getElementById('salaryModeBtn');
+        this.hourlyModeDiv = document.getElementById('hourlyMode');
+        this.salaryModeDiv = document.getElementById('salaryMode');
     }
 
     bindEvents() {
@@ -31,9 +40,16 @@ class IncomeTracker {
         this.stopBtn.addEventListener('click', () => this.stop());
         this.resetBtn.addEventListener('click', () => this.reset());
         
+        // 모드 전환 이벤트
+        this.hourlyModeBtn.addEventListener('click', () => this.switchMode('hourly'));
+        this.salaryModeBtn.addEventListener('click', () => this.switchMode('salary'));
+        
+        // 시급 입력 이벤트
         this.hourlyWageInput.addEventListener('input', () => {
-            this.updatePerSecondIncome();
-            this.updateDisplayHourlyWage();
+            if (this.inputMode === 'hourly') {
+                this.updatePerSecondIncome();
+                this.updateDisplayHourlyWage();
+            }
         });
         
         this.hourlyWageInput.addEventListener('keypress', (e) => {
@@ -41,25 +57,91 @@ class IncomeTracker {
                 this.start();
             }
         });
+        
+        // 월급 입력 이벤트
+        this.monthlySalaryInput.addEventListener('input', () => {
+            if (this.inputMode === 'salary') {
+                this.calculateHourlyWageFromSalary();
+            }
+        });
+        
+        this.monthlyHoursInput.addEventListener('input', () => {
+            if (this.inputMode === 'salary') {
+                this.calculateHourlyWageFromSalary();
+            }
+        });
+        
+        this.monthlySalaryInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                this.start();
+            }
+        });
+    }
+
+    switchMode(mode) {
+        this.inputMode = mode;
+        
+        if (mode === 'hourly') {
+            this.hourlyModeBtn.classList.add('active');
+            this.salaryModeBtn.classList.remove('active');
+            this.hourlyModeDiv.classList.remove('hidden');
+            this.salaryModeDiv.classList.add('hidden');
+            this.updatePerSecondIncome();
+            this.updateDisplayHourlyWage();
+            this.hourlyWageInput.focus();
+        } else {
+            this.salaryModeBtn.classList.add('active');
+            this.hourlyModeBtn.classList.remove('active');
+            this.salaryModeDiv.classList.remove('hidden');
+            this.hourlyModeDiv.classList.add('hidden');
+            this.calculateHourlyWageFromSalary();
+            this.monthlySalaryInput.focus();
+        }
+    }
+
+    calculateHourlyWageFromSalary() {
+        const salary = parseFloat(this.monthlySalaryInput.value) || 0;
+        const hours = parseFloat(this.monthlyHoursInput.value) || 176;
+        
+        const calculatedHourlyWage = salary / hours;
+        this.hourlyWageInput.value = Math.round(calculatedHourlyWage);
+        
+        this.updatePerSecondIncome();
+        this.updateDisplayHourlyWage();
     }
 
     updatePerSecondIncome() {
-        const wage = parseFloat(this.hourlyWageInput.value) || 0;
+        const wage = this.getCurrentHourlyWage();
         const perSecond = wage / 3600;
         this.perSecondIncome.textContent = this.formatNumber(perSecond);
     }
 
     updateDisplayHourlyWage() {
-        const wage = parseFloat(this.hourlyWageInput.value) || 0;
+        const wage = this.getCurrentHourlyWage();
         this.displayHourlyWage.textContent = '₩' + this.formatNumber(wage);
     }
 
+    getCurrentHourlyWage() {
+        if (this.inputMode === 'hourly') {
+            return parseFloat(this.hourlyWageInput.value) || 0;
+        } else {
+            const salary = parseFloat(this.monthlySalaryInput.value) || 0;
+            const hours = parseFloat(this.monthlyHoursInput.value) || 176;
+            return salary / hours;
+        }
+    }
+
     start() {
-        const wage = parseFloat(this.hourlyWageInput.value);
+        const wage = this.getCurrentHourlyWage();
         
         if (!wage || wage <= 0) {
-            alert('유효한 시급을 입력해주세요!');
-            this.hourlyWageInput.focus();
+            if (this.inputMode === 'hourly') {
+                alert('유효한 시급을 입력해주세요!');
+                this.hourlyWageInput.focus();
+            } else {
+                alert('유효한 월급과 근무시간을 입력해주세요!');
+                this.monthlySalaryInput.focus();
+            }
             return;
         }
         
@@ -72,6 +154,10 @@ class IncomeTracker {
         this.startBtn.disabled = true;
         this.stopBtn.disabled = false;
         this.hourlyWageInput.disabled = true;
+        this.monthlySalaryInput.disabled = true;
+        this.monthlyHoursInput.disabled = true;
+        this.hourlyModeBtn.disabled = true;
+        this.salaryModeBtn.disabled = true;
         
         // 화면이 꺼지지 않도록 설정
         this.keepScreenAwake();
@@ -93,6 +179,10 @@ class IncomeTracker {
         this.startBtn.disabled = false;
         this.stopBtn.disabled = true;
         this.hourlyWageInput.disabled = false;
+        this.monthlySalaryInput.disabled = false;
+        this.monthlyHoursInput.disabled = false;
+        this.hourlyModeBtn.disabled = false;
+        this.salaryModeBtn.disabled = false;
     }
 
     reset() {
@@ -104,9 +194,22 @@ class IncomeTracker {
         this.incomeAmount.textContent = '₩0';
         this.elapsedTime.textContent = '00:00:00';
         
-        this.hourlyWageInput.value = '';
-        this.hourlyWageInput.disabled = false;
-        this.hourlyWageInput.focus();
+        // 현재 모드에 따라 적절한 필드 초기화
+        if (this.inputMode === 'hourly') {
+            this.hourlyWageInput.value = '';
+            this.hourlyWageInput.disabled = false;
+            this.hourlyWageInput.focus();
+        } else {
+            this.monthlySalaryInput.value = '';
+            this.monthlyHoursInput.value = '176';
+            this.hourlyWageInput.value = '';
+            this.monthlySalaryInput.disabled = false;
+            this.monthlyHoursInput.disabled = false;
+            this.monthlySalaryInput.focus();
+        }
+        
+        this.hourlyModeBtn.disabled = false;
+        this.salaryModeBtn.disabled = false;
         
         this.updatePerSecondIncome();
         this.updateDisplayHourlyWage();
