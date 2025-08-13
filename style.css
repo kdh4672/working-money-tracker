@@ -86,7 +86,7 @@ h1 {
     display: none;
 }
 
-.hours-info {
+.hours-info, .unit-info {
     font-size: 0.8rem;
     color: #6c757d;
     margin-top: -15px;
@@ -95,8 +95,68 @@ h1 {
     font-style: italic;
 }
 
+.work-time-section {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+    border: 1px solid #e9ecef;
+}
+
+.time-inputs {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.time-input-group {
+    flex: 1;
+    text-align: center;
+}
+
+.time-input-group label {
+    font-size: 0.9rem;
+    color: #495057;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.time-input-group input[type="time"] {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #495057;
+    background: white;
+    transition: border-color 0.3s ease;
+}
+
+.time-input-group input[type="time"]:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.work-time-info {
+    font-size: 0.8rem;
+    color: #6c757d;
+    text-align: center;
+    font-style: italic;
+    margin-top: 10px;
+}
+
 .control-buttons {
     margin-top: 20px;
+}
+
+@media (max-width: 480px) {
+    .time-inputs {
+        flex-direction: column;
+        gap: 15px;
+    }
 }
 
 label {

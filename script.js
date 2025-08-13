@@ -19,6 +19,8 @@ class IncomeTracker {
         this.hourlyWageInput = document.getElementById('hourlyWage');
         this.monthlySalaryInput = document.getElementById('monthlySalary');
         this.monthlyHoursInput = document.getElementById('monthlyHours');
+        this.workStartTimeInput = document.getElementById('workStartTime');
+        this.workEndTimeInput = document.getElementById('workEndTime');
         this.startBtn = document.getElementById('startBtn');
         this.stopBtn = document.getElementById('stopBtn');
         this.resetBtn = document.getElementById('resetBtn');
@@ -100,7 +102,8 @@ class IncomeTracker {
     }
 
     calculateHourlyWageFromSalary() {
-        const salary = parseFloat(this.monthlySalaryInput.value) || 0;
+        const salaryInManwon = parseFloat(this.monthlySalaryInput.value) || 0;
+        const salary = salaryInManwon * 10000; // 만원을 원으로 변환
         const hours = parseFloat(this.monthlyHoursInput.value) || 176;
         
         const calculatedHourlyWage = salary / hours;
@@ -125,7 +128,8 @@ class IncomeTracker {
         if (this.inputMode === 'hourly') {
             return parseFloat(this.hourlyWageInput.value) || 0;
         } else {
-            const salary = parseFloat(this.monthlySalaryInput.value) || 0;
+            const salaryInManwon = parseFloat(this.monthlySalaryInput.value) || 0;
+            const salary = salaryInManwon * 10000; // 만원을 원으로 변환
             const hours = parseFloat(this.monthlyHoursInput.value) || 176;
             return salary / hours;
         }
@@ -146,8 +150,22 @@ class IncomeTracker {
         }
         
         this.hourlyWage = wage;
-        this.startTime = performance.now();
-        this.lastUpdateTime = this.startTime;
+        
+        // 출근 시간을 기준으로 시작 시간 계산
+        const now = new Date();
+        const workStartTime = this.parseTimeInput(this.workStartTimeInput.value);
+        const workStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 
+                                   workStartTime.hours, workStartTime.minutes, 0);
+        
+        // 만약 현재 시간이 출근 시간보다 이전이면, 출근 시간을 현재 시간으로 설정
+        if (now < workStart) {
+            this.workStartTime = now.getTime();
+        } else {
+            this.workStartTime = workStart.getTime();
+        }
+        
+        this.startTime = this.workStartTime;
+        this.lastUpdateTime = performance.now();
         this.isRunning = true;
         this.totalEarned = 0;
         
@@ -156,6 +174,8 @@ class IncomeTracker {
         this.hourlyWageInput.disabled = true;
         this.monthlySalaryInput.disabled = true;
         this.monthlyHoursInput.disabled = true;
+        this.workStartTimeInput.disabled = true;
+        this.workEndTimeInput.disabled = true;
         this.hourlyModeBtn.disabled = true;
         this.salaryModeBtn.disabled = true;
         
@@ -181,6 +201,8 @@ class IncomeTracker {
         this.hourlyWageInput.disabled = false;
         this.monthlySalaryInput.disabled = false;
         this.monthlyHoursInput.disabled = false;
+        this.workStartTimeInput.disabled = false;
+        this.workEndTimeInput.disabled = false;
         this.hourlyModeBtn.disabled = false;
         this.salaryModeBtn.disabled = false;
     }
@@ -210,23 +232,32 @@ class IncomeTracker {
         
         this.hourlyModeBtn.disabled = false;
         this.salaryModeBtn.disabled = false;
+        this.workStartTimeInput.disabled = false;
+        this.workEndTimeInput.disabled = false;
         
         this.updatePerSecondIncome();
         this.updateDisplayHourlyWage();
     }
 
+    parseTimeInput(timeString) {
+        const [hours, minutes] = timeString.split(':').map(Number);
+        return { hours, minutes };
+    }
+
     animate() {
         if (!this.isRunning) return;
         
-        const currentTime = performance.now();
-        const elapsedMs = currentTime - this.startTime;
-        const elapsedSeconds = elapsedMs / 1000;
+        // 현재 시간과 출근 시간의 차이를 계산 (실제 시간 기준)
+        const now = Date.now();
+        const elapsedRealMs = now - this.workStartTime;
+        const elapsedRealSeconds = elapsedRealMs / 1000;
         
-        this.totalEarned = (this.hourlyWage * elapsedSeconds) / 3600;
+        // 실제 경과 시간으로 수익 계산
+        this.totalEarned = (this.hourlyWage * elapsedRealSeconds) / 3600;
         
-        this.updateDisplay(elapsedMs);
+        this.updateDisplay(elapsedRealMs);
         
-        this.lastUpdateTime = currentTime;
+        this.lastUpdateTime = performance.now();
         this.animationId = requestAnimationFrame(() => this.animate());
     }
 
