@@ -156,13 +156,16 @@ class IncomeTracker {
 
     updateIncomeDisplayVisibility() {
         const wage = this.getCurrentHourlyWage();
-        if (wage > 0) {
+        if (wage > 0 && !this.isRunning) {
+            // 시급이 있고 아직 시작하지 않은 상태에서는 일과 중 UI 표시
             this.incomeDisplay.style.display = 'block';
             this.displayHourlyWage.parentElement.style.display = 'block';
-        } else {
+            this.showWorkingUI();
+        } else if (wage <= 0) {
             this.incomeDisplay.style.display = 'none';
             this.displayHourlyWage.parentElement.style.display = 'none';
         }
+        // isRunning이 true일 때는 animate()에서 처리
     }
 
     getCurrentHourlyWage() {
