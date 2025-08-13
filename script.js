@@ -44,6 +44,13 @@ class IncomeTracker {
         this.workingContent = document.getElementById('workingContent');
         this.celebrationContent = document.getElementById('celebrationContent');
         this.totalDailyEarning = document.getElementById('totalDailyEarning');
+        
+        // 계산된 시급 표시 요소들
+        this.calculatedHourlyWage = document.getElementById('calculatedHourlyWage');
+        this.calculatedHourlyValue = document.getElementById('calculatedHourlyValue');
+        
+        // 초기 상태에서 수익 표시 숨기기
+        this.updateIncomeDisplayVisibility();
     }
 
     bindEvents() {
@@ -60,6 +67,7 @@ class IncomeTracker {
             if (this.inputMode === 'hourly') {
                 this.updatePerSecondIncome();
                 this.updateDisplayHourlyWage();
+                this.updateIncomeDisplayVisibility();
             }
         });
         
@@ -73,12 +81,14 @@ class IncomeTracker {
         this.monthlySalaryInput.addEventListener('input', () => {
             if (this.inputMode === 'salary') {
                 this.calculateHourlyWageFromSalary();
+                this.updateIncomeDisplayVisibility();
             }
         });
         
         this.monthlyHoursInput.addEventListener('input', () => {
             if (this.inputMode === 'salary') {
                 this.calculateHourlyWageFromSalary();
+                this.updateIncomeDisplayVisibility();
             }
         });
         
@@ -97,8 +107,10 @@ class IncomeTracker {
             this.salaryModeBtn.classList.remove('active');
             this.hourlyModeDiv.classList.remove('hidden');
             this.salaryModeDiv.classList.add('hidden');
+            this.calculatedHourlyWage.style.display = 'none'; // 시급 모드에서는 계산된 시급 숨기기
             this.updatePerSecondIncome();
             this.updateDisplayHourlyWage();
+            this.updateIncomeDisplayVisibility();
             this.hourlyWageInput.focus();
         } else {
             this.salaryModeBtn.classList.add('active');
@@ -106,6 +118,7 @@ class IncomeTracker {
             this.salaryModeDiv.classList.remove('hidden');
             this.hourlyModeDiv.classList.add('hidden');
             this.calculateHourlyWageFromSalary();
+            this.updateIncomeDisplayVisibility();
             this.monthlySalaryInput.focus();
         }
     }
@@ -117,6 +130,14 @@ class IncomeTracker {
         
         const calculatedHourlyWage = salary / hours;
         this.hourlyWageInput.value = Math.round(calculatedHourlyWage);
+        
+        // 계산된 시급 표시
+        if (salaryInManwon > 0) {
+            this.calculatedHourlyValue.textContent = '₩' + this.formatNumber(calculatedHourlyWage);
+            this.calculatedHourlyWage.style.display = 'block';
+        } else {
+            this.calculatedHourlyWage.style.display = 'none';
+        }
         
         this.updatePerSecondIncome();
         this.updateDisplayHourlyWage();
@@ -131,6 +152,17 @@ class IncomeTracker {
     updateDisplayHourlyWage() {
         const wage = this.getCurrentHourlyWage();
         this.displayHourlyWage.textContent = '₩' + this.formatNumber(wage);
+    }
+
+    updateIncomeDisplayVisibility() {
+        const wage = this.getCurrentHourlyWage();
+        if (wage > 0) {
+            this.incomeDisplay.style.display = 'block';
+            this.displayHourlyWage.parentElement.style.display = 'block';
+        } else {
+            this.incomeDisplay.style.display = 'none';
+            this.displayHourlyWage.parentElement.style.display = 'none';
+        }
     }
 
     getCurrentHourlyWage() {
@@ -242,11 +274,13 @@ class IncomeTracker {
         if (this.inputMode === 'hourly') {
             this.hourlyWageInput.value = '';
             this.hourlyWageInput.disabled = false;
+            this.calculatedHourlyWage.style.display = 'none';
             this.hourlyWageInput.focus();
         } else {
             this.monthlySalaryInput.value = '';
             this.monthlyHoursInput.value = '176';
             this.hourlyWageInput.value = '';
+            this.calculatedHourlyWage.style.display = 'none';
             this.monthlySalaryInput.disabled = false;
             this.monthlyHoursInput.disabled = false;
             this.monthlySalaryInput.focus();
@@ -259,6 +293,7 @@ class IncomeTracker {
         
         this.updatePerSecondIncome();
         this.updateDisplayHourlyWage();
+        this.updateIncomeDisplayVisibility();
     }
 
     parseTimeInput(timeString) {
