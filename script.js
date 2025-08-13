@@ -214,12 +214,23 @@ class IncomeTracker {
         this.isRunning = true;
         this.totalEarned = 0;
         
-        // UI 초기화 (퇴근 메시지 숨기기)
-        this.showWorkingUI();
-        
         // 시작할 때 수익 표시창 보이기
         this.incomeDisplay.style.display = 'block';
         this.displayHourlyWage.parentElement.style.display = 'block';
+        
+        // 시작할 때 이미 퇴근 시간이 지났는지 확인
+        const currentTime = Date.now();
+        if (currentTime >= this.workEndTime) {
+            // 이미 퇴근 시간이 지났다면 즉시 축하 화면 표시
+            this.isWorkFinished = true;
+            const workDurationMs = this.workEndTime - this.workStartTime;
+            const workDurationSeconds = workDurationMs / 1000;
+            this.totalEarned = (this.hourlyWage * workDurationSeconds) / 3600;
+            this.showEndOfWorkUI();
+        } else {
+            // 아직 퇴근 시간 전이라면 working UI 표시
+            this.showWorkingUI();
+        }
         
         this.startBtn.disabled = true;
         this.stopBtn.disabled = false;
@@ -245,8 +256,10 @@ class IncomeTracker {
             this.animationId = null;
         }
         
-        // 정지할 때는 축하 메시지 숨기고 working UI로 변경
-        this.showWorkingUI();
+        // 일과가 끝났다면 축하 UI 유지, 아니면 working UI로 변경
+        if (!this.isWorkFinished) {
+            this.showWorkingUI();
+        }
         
         // 화면 깨우기 해제
         this.releaseScreenWake();
