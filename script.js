@@ -49,8 +49,12 @@ class IncomeTracker {
         this.calculatedHourlyWage = document.getElementById('calculatedHourlyWage');
         this.calculatedHourlyValue = document.getElementById('calculatedHourlyValue');
         
-        // 초기 상태에서 수익 표시 숨기기
-        this.updateIncomeDisplayVisibility();
+        // 초기 상태에서 수익 표시 무조건 숨기기
+        this.incomeDisplay.style.display = 'none';
+        this.displayHourlyWage.parentElement.style.display = 'none';
+        
+        // 초기 상태에서는 반드시 working UI 표시 (축하 메시지 숨김)
+        this.showWorkingUI();
     }
 
     bindEvents() {
@@ -240,6 +244,9 @@ class IncomeTracker {
             cancelAnimationFrame(this.animationId);
             this.animationId = null;
         }
+        
+        // 정지할 때는 축하 메시지 숨기고 working UI로 변경
+        this.showWorkingUI();
         
         // 화면 깨우기 해제
         this.releaseScreenWake();
