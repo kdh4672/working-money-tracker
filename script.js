@@ -67,7 +67,6 @@ class IncomeTracker {
             if (this.inputMode === 'hourly') {
                 this.updatePerSecondIncome();
                 this.updateDisplayHourlyWage();
-                this.updateIncomeDisplayVisibility();
             }
         });
         
@@ -81,14 +80,12 @@ class IncomeTracker {
         this.monthlySalaryInput.addEventListener('input', () => {
             if (this.inputMode === 'salary') {
                 this.calculateHourlyWageFromSalary();
-                this.updateIncomeDisplayVisibility();
             }
         });
         
         this.monthlyHoursInput.addEventListener('input', () => {
             if (this.inputMode === 'salary') {
                 this.calculateHourlyWageFromSalary();
-                this.updateIncomeDisplayVisibility();
             }
         });
         
@@ -110,7 +107,6 @@ class IncomeTracker {
             this.calculatedHourlyWage.style.display = 'none'; // 시급 모드에서는 계산된 시급 숨기기
             this.updatePerSecondIncome();
             this.updateDisplayHourlyWage();
-            this.updateIncomeDisplayVisibility();
             this.hourlyWageInput.focus();
         } else {
             this.salaryModeBtn.classList.add('active');
@@ -118,7 +114,6 @@ class IncomeTracker {
             this.salaryModeDiv.classList.remove('hidden');
             this.hourlyModeDiv.classList.add('hidden');
             this.calculateHourlyWageFromSalary();
-            this.updateIncomeDisplayVisibility();
             this.monthlySalaryInput.focus();
         }
     }
@@ -155,17 +150,13 @@ class IncomeTracker {
     }
 
     updateIncomeDisplayVisibility() {
+        // 수익 표시는 시작 버튼을 눌렀을 때만 보이도록 변경
         const wage = this.getCurrentHourlyWage();
-        if (wage > 0 && !this.isRunning) {
-            // 시급이 있고 아직 시작하지 않은 상태에서는 일과 중 UI 표시
-            this.incomeDisplay.style.display = 'block';
-            this.displayHourlyWage.parentElement.style.display = 'block';
-            this.showWorkingUI();
-        } else if (wage <= 0) {
+        if (wage <= 0 || !this.isRunning) {
             this.incomeDisplay.style.display = 'none';
             this.displayHourlyWage.parentElement.style.display = 'none';
         }
-        // isRunning이 true일 때는 animate()에서 처리
+        // isRunning이 true일 때만 표시
     }
 
     getCurrentHourlyWage() {
@@ -221,6 +212,10 @@ class IncomeTracker {
         
         // UI 초기화 (퇴근 메시지 숨기기)
         this.showWorkingUI();
+        
+        // 시작할 때 수익 표시창 보이기
+        this.incomeDisplay.style.display = 'block';
+        this.displayHourlyWage.parentElement.style.display = 'block';
         
         this.startBtn.disabled = true;
         this.stopBtn.disabled = false;
@@ -296,7 +291,10 @@ class IncomeTracker {
         
         this.updatePerSecondIncome();
         this.updateDisplayHourlyWage();
-        this.updateIncomeDisplayVisibility();
+        
+        // reset에서는 수익 표시창 숨기기
+        this.incomeDisplay.style.display = 'none';
+        this.displayHourlyWage.parentElement.style.display = 'none';
     }
 
     parseTimeInput(timeString) {
