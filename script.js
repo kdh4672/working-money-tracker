@@ -53,8 +53,10 @@ class IncomeTracker {
         this.incomeDisplay.style.display = 'none';
         this.displayHourlyWage.parentElement.style.display = 'none';
         
-        // 초기 상태에서는 반드시 working UI 표시 (축하 메시지 숨김)
-        this.showWorkingUI();
+        // 초기 상태에서는 반드시 working UI만 표시 (축하 메시지 완전히 숨김)
+        this.incomeDisplay.classList.remove('celebration');
+        this.workingContent.classList.remove('hidden');
+        this.celebrationContent.classList.add('hidden');
     }
 
     bindEvents() {
@@ -283,8 +285,10 @@ class IncomeTracker {
         this.isWorkFinished = false;
         this.workEndTime = null;
         
-        // UI 초기화
-        this.showWorkingUI();
+        // UI 초기화 - 반드시 working UI만 표시
+        this.incomeDisplay.classList.remove('celebration');
+        this.workingContent.classList.remove('hidden');
+        this.celebrationContent.classList.add('hidden');
         this.incomeAmount.textContent = '₩0';
         this.elapsedTime.textContent = '00:00:00';
         
