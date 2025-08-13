@@ -35,35 +35,6 @@ body {
     z-index: 1;
 }
 
-.container::before {
-    content: '';
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 80px;
-    height: 80px;
-    background-image: url('https://cdn.pixabay.com/photo/2021/01/28/15/51/dog-5955790_960_720.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    opacity: 0.7;
-    z-index: 0;
-}
-
-.container::after {
-    content: '';
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
-    width: 60px;
-    height: 60px;
-    background-image: url('https://cdn.pixabay.com/photo/2017/09/25/13/12/puppy-2785074_960_720.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    opacity: 0.6;
-    z-index: 0;
-}
 
 h1 {
     color: #1a365d;
