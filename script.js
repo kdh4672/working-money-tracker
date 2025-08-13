@@ -7,6 +7,8 @@ class IncomeTracker {
         this.totalEarned = 0;
         this.lastUpdateTime = null;
         this.inputMode = 'hourly'; // 'hourly' or 'salary'
+        this.isWorkFinished = false;
+        this.workEndTime = null;
         
         this.initElements();
         this.bindEvents();
@@ -35,6 +37,12 @@ class IncomeTracker {
         this.salaryModeBtn = document.getElementById('salaryModeBtn');
         this.hourlyModeDiv = document.getElementById('hourlyMode');
         this.salaryModeDiv = document.getElementById('salaryMode');
+        
+        // 퇴근 메시지 관련 요소들
+        this.incomeLabel = document.getElementById('incomeLabel');
+        this.incomeSubtitle = document.getElementById('incomeSubtitle');
+        this.endOfWorkMessage = document.getElementById('endOfWorkMessage');
+        this.totalDailyEarning = document.getElementById('totalDailyEarning');
     }
 
     bindEvents() {
@@ -150,12 +158,17 @@ class IncomeTracker {
         }
         
         this.hourlyWage = wage;
+        this.isWorkFinished = false;
         
         // 출근 시간을 기준으로 시작 시간 계산
         const now = new Date();
         const workStartTime = this.parseTimeInput(this.workStartTimeInput.value);
+        const workEndTime = this.parseTimeInput(this.workEndTimeInput.value);
+        
         const workStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 
                                    workStartTime.hours, workStartTime.minutes, 0);
+        const workEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 
+                                 workEndTime.hours, workEndTime.minutes, 0);
         
         // 만약 현재 시간이 출근 시간보다 이전이면, 출근 시간을 현재 시간으로 설정
         if (now < workStart) {
@@ -164,10 +177,14 @@ class IncomeTracker {
             this.workStartTime = workStart.getTime();
         }
         
+        this.workEndTime = workEnd.getTime();
         this.startTime = this.workStartTime;
         this.lastUpdateTime = performance.now();
         this.isRunning = true;
         this.totalEarned = 0;
+        
+        // UI 초기화 (퇴근 메시지 숨기기)
+        this.showWorkingUI();
         
         this.startBtn.disabled = true;
         this.stopBtn.disabled = false;
@@ -212,7 +229,11 @@ class IncomeTracker {
         this.totalEarned = 0;
         this.startTime = null;
         this.lastUpdateTime = null;
+        this.isWorkFinished = false;
+        this.workEndTime = null;
         
+        // UI 초기화
+        this.showWorkingUI();
         this.incomeAmount.textContent = '₩0';
         this.elapsedTime.textContent = '00:00:00';
         
@@ -244,18 +265,46 @@ class IncomeTracker {
         return { hours, minutes };
     }
 
+    showWorkingUI() {
+        this.incomeLabel.textContent = '지금까지 번 돈';
+        this.incomeSubtitle.style.display = 'block';
+        this.endOfWorkMessage.classList.add('hidden');
+    }
+
+    showEndOfWorkUI() {
+        this.incomeLabel.textContent = '오늘 하루 총 수익';
+        this.incomeSubtitle.style.display = 'none';
+        this.endOfWorkMessage.classList.remove('hidden');
+        this.totalDailyEarning.textContent = '₩' + this.formatNumber(this.totalEarned);
+    }
+
     animate() {
         if (!this.isRunning) return;
         
         // 현재 시간과 출근 시간의 차이를 계산 (실제 시간 기준)
         const now = Date.now();
-        const elapsedRealMs = now - this.workStartTime;
-        const elapsedRealSeconds = elapsedRealMs / 1000;
         
-        // 실제 경과 시간으로 수익 계산
-        this.totalEarned = (this.hourlyWage * elapsedRealSeconds) / 3600;
+        // 퇴근 시간이 지났는지 확인
+        if (now >= this.workEndTime && !this.isWorkFinished) {
+            this.isWorkFinished = true;
+            // 퇴근 시간까지의 수익만 계산
+            const workDurationMs = this.workEndTime - this.workStartTime;
+            const workDurationSeconds = workDurationMs / 1000;
+            this.totalEarned = (this.hourlyWage * workDurationSeconds) / 3600;
+            this.showEndOfWorkUI();
+        }
         
-        this.updateDisplay(elapsedRealMs);
+        if (!this.isWorkFinished) {
+            // 아직 퇴근 시간 전이면 실시간 계산
+            const elapsedRealMs = now - this.workStartTime;
+            const elapsedRealSeconds = elapsedRealMs / 1000;
+            this.totalEarned = (this.hourlyWage * elapsedRealSeconds) / 3600;
+            this.updateDisplay(elapsedRealMs);
+        } else {
+            // 퇴근 후에는 고정된 값만 표시
+            const workDurationMs = this.workEndTime - this.workStartTime;
+            this.updateDisplay(workDurationMs);
+        }
         
         this.lastUpdateTime = performance.now();
         this.animationId = requestAnimationFrame(() => this.animate());
