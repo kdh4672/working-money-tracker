@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:wakelock/wakelock.dart';
+// import 'package:wakelock_plus/wakelock_plus.dart';  // 웹 테스트를 위해 임시 비활성화
 import '../providers/income_provider.dart';
 import '../models/income_tracker.dart';
 import '../widgets/input_mode_toggle.dart';
@@ -10,6 +10,7 @@ import '../widgets/work_time_section.dart';
 import '../widgets/income_display.dart';
 import '../widgets/control_buttons.dart';
 import '../widgets/stats_section.dart';
+import '../widgets/lunch_time_switch.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,12 +24,12 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     // 앱 시작 시 화면이 꺼지지 않도록 설정
-    Wakelock.enable();
+    // WakelockPlus.enable();  // 웹 테스트를 위해 임시 비활성화
   }
 
   @override
   void dispose() {
-    Wakelock.disable();
+    // WakelockPlus.disable();  // 웹 테스트를 위해 임시 비활성화
     super.dispose();
   }
 
@@ -113,6 +114,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         
                         const WorkTimeSection(),
                         const SizedBox(height: 20),
+                        
+                        const LunchTimeSwitch(),
                         
                         const ControlButtons(),
                       ],

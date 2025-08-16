@@ -154,6 +154,16 @@ class IncomeProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void toggleLunchTimeDeduction() {
+    _tracker.deductLunchTime = !_tracker.deductLunchTime;
+    // 실행 중이라면 즉시 수익 재계산
+    if (_tracker.isRunning) {
+      _tracker.updateEarnings();
+    }
+    notifyListeners();
+    _saveState();
+  }
+
   String formatCurrency(double amount) {
     return '₩${amount.round().toString().replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),

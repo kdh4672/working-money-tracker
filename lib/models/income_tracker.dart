@@ -9,6 +9,7 @@ class IncomeTracker {
   InputMode inputMode;
   double monthlySalary;
   double monthlyHours;
+  bool deductLunchTime;
 
   IncomeTracker({
     this.hourlyWage = 0,
@@ -21,6 +22,7 @@ class IncomeTracker {
     this.inputMode = InputMode.hourly,
     this.monthlySalary = 0,
     this.monthlyHours = 176,
+    this.deductLunchTime = false,
   });
 
   double get perSecondIncome => hourlyWage / 3600;
@@ -33,11 +35,11 @@ class IncomeTracker {
   }
 
   Duration get elapsedTime {
-    if (startTime == null) return Duration.zero;
+    if (workStartTime == null) return Duration.zero;
     
     final now = DateTime.now();
     final endTime = isWorkFinished ? workEndTime! : now;
-    return endTime.difference(startTime!);
+    return endTime.difference(workStartTime!);
   }
 
   void start() {
@@ -45,20 +47,41 @@ class IncomeTracker {
     
     final now = DateTime.now();
     
+    // workStartTime이 설정되지 않았으면 현재 시간으로 설정
+    if (workStartTime == null) {
+      workStartTime = now;
+    }
+    
     // 출근 시간이 현재 시간보다 이후라면 현재 시간으로 설정
-    if (workStartTime != null && workStartTime!.isAfter(now)) {
+    if (workStartTime!.isAfter(now)) {
       startTime = now;
+      // workStartTime도 현재 시간으로 업데이트
+      workStartTime = now;
     } else {
-      startTime = workStartTime ?? now;
+      startTime = workStartTime;
     }
     
     isRunning = true;
     isWorkFinished = false;
-    totalEarned = 0;
     
     // 시작할 때 이미 퇴근 시간이 지났는지 확인
     if (workEndTime != null && now.isAfter(workEndTime!)) {
-      _finishWork();
+      // 이미 퇴근 시간이 지났다면 즉시 완료 처리
+      isWorkFinished = true;
+      final workDurationSeconds = workEndTime!.difference(workStartTime!).inSeconds;
+      final lunchDeductionSeconds = deductLunchTime ? 3600 : 0; // 1시간 = 3600초
+      final actualWorkSeconds = workDurationSeconds - lunchDeductionSeconds;
+      totalEarned = (calculatedHourlyWage * actualWorkSeconds) / 3600;
+    } else {
+      // 아직 퇴근 시간 전이라면, 이미 근무한 시간만큼 초기 금액 계산
+      if (workStartTime!.isBefore(now)) {
+        final alreadyWorkedSeconds = now.difference(workStartTime!).inSeconds;
+        final lunchDeductionSeconds = deductLunchTime ? 3600 : 0; // 1시간 = 3600초
+        final actualWorkSeconds = alreadyWorkedSeconds - lunchDeductionSeconds;
+        totalEarned = (calculatedHourlyWage * actualWorkSeconds) / 3600;
+      } else {
+        totalEarned = 0;
+      }
     }
   }
 
@@ -74,31 +97,39 @@ class IncomeTracker {
     hourlyWage = 0;
     monthlySalary = 0;
     monthlyHours = 176;
+    deductLunchTime = false;
   }
 
   void updateEarnings() {
-    if (!isRunning || startTime == null) return;
+    if (!isRunning || workStartTime == null) return;
     
     final now = DateTime.now();
     
     // 퇴근 시간 체크
     if (workEndTime != null && now.isAfter(workEndTime!) && !isWorkFinished) {
-      _finishWork();
+      isWorkFinished = true;
+      final workDurationSeconds = workEndTime!.difference(workStartTime!).inSeconds;
+      final lunchDeductionSeconds = deductLunchTime ? 3600 : 0; // 1시간 = 3600초
+      final actualWorkSeconds = workDurationSeconds - lunchDeductionSeconds;
+      totalEarned = (calculatedHourlyWage * actualWorkSeconds) / 3600;
       return;
     }
     
-    final endTime = isWorkFinished ? workEndTime! : now;
-    final elapsedSeconds = endTime.difference(startTime!).inSeconds;
-    totalEarned = (calculatedHourlyWage * elapsedSeconds) / 3600;
-  }
-
-  void _finishWork() {
-    isWorkFinished = true;
-    if (workEndTime != null && startTime != null) {
-      final workDuration = workEndTime!.difference(startTime!).inSeconds;
-      totalEarned = (calculatedHourlyWage * workDuration) / 3600;
+    if (!isWorkFinished) {
+      // 아직 퇴근 시간 전이면 실시간 계산 (출근시간부터 현재까지)
+      final elapsedSeconds = now.difference(workStartTime!).inSeconds;
+      final lunchDeductionSeconds = deductLunchTime ? 3600 : 0; // 1시간 = 3600초
+      final actualWorkSeconds = elapsedSeconds - lunchDeductionSeconds;
+      totalEarned = (calculatedHourlyWage * actualWorkSeconds) / 3600;
+    } else {
+      // 퇴근 후에는 고정된 값 유지
+      final workDurationSeconds = workEndTime!.difference(workStartTime!).inSeconds;
+      final lunchDeductionSeconds = deductLunchTime ? 3600 : 0; // 1시간 = 3600초
+      final actualWorkSeconds = workDurationSeconds - lunchDeductionSeconds;
+      totalEarned = (calculatedHourlyWage * actualWorkSeconds) / 3600;
     }
   }
+
 
   Map<String, dynamic> toJson() {
     return {
@@ -112,6 +143,7 @@ class IncomeTracker {
       'inputMode': inputMode.index,
       'monthlySalary': monthlySalary,
       'monthlyHours': monthlyHours,
+      'deductLunchTime': deductLunchTime,
     };
   }
 
@@ -133,6 +165,7 @@ class IncomeTracker {
       inputMode: InputMode.values[json['inputMode'] ?? 0],
       monthlySalary: json['monthlySalary']?.toDouble() ?? 0,
       monthlyHours: json['monthlyHours']?.toDouble() ?? 176,
+      deductLunchTime: json['deductLunchTime'] ?? false,
     );
   }
 }
