@@ -13,20 +13,16 @@ class StatsSection extends StatelessWidget {
           return const SizedBox.shrink();
         }
 
-        return Row(
+        return Column(
           children: [
-            Expanded(
-              child: _buildStatItem(
-                '경과 시간',
-                provider.formatTime(provider.tracker.elapsedTime),
-              ),
+            _buildStatItem(
+              '경과 시간',
+              provider.formatTime(provider.tracker.elapsedTime),
             ),
-            const SizedBox(width: 20),
-            Expanded(
-              child: _buildStatItem(
-                '시급',
-                provider.formatCurrency(provider.tracker.calculatedHourlyWage),
-              ),
+            const SizedBox(height: 15),
+            _buildStatItem(
+              '시급',
+              provider.formatCurrency(provider.tracker.calculatedHourlyWage),
             ),
           ],
         );

@@ -20,12 +20,20 @@ class IncomeDisplay extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: provider.tracker.isWorkFinished
                 ? const LinearGradient(
-                    colors: [Color(0xFF8B5CF6), Color(0xFF7C3AED), Color(0xFF6D28D9)],
+                    colors: [
+                      Color(0xFF8B5CF6),
+                      Color(0xFF7C3AED),
+                      Color(0xFF6D28D9)
+                    ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   )
                 : const LinearGradient(
-                    colors: [Color(0xFF00B4DB), Color(0xFF0083B0), Color(0xFF005A8A)],
+                    colors: [
+                      Color(0xFF00B4DB),
+                      Color(0xFF0083B0),
+                      Color(0xFF005A8A)
+                    ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -66,7 +74,7 @@ class IncomeDisplay extends StatelessWidget {
             provider.formatCurrency(provider.tracker.totalEarned),
             key: ValueKey(provider.tracker.totalEarned.round()),
             style: const TextStyle(
-              fontSize: 42,
+              fontSize: 30,
               color: Colors.white,
               fontWeight: FontWeight.w700,
               shadows: [
@@ -102,7 +110,7 @@ class IncomeDisplay extends StatelessWidget {
         ),
         const SizedBox(height: 15),
         const Text(
-          '오늘 하루 정말 고생하셨습니다!',
+          '오늘 하루 정말\n고생하셨습니다!',
           style: TextStyle(
             fontSize: 24,
             color: Colors.white,
@@ -129,7 +137,7 @@ class IncomeDisplay extends StatelessWidget {
         ),
         const SizedBox(height: 15),
         const Text(
-          '💪 내일도 화이팅! 좋은 하루 되세요',
+          '💪 내일도 화이팅!\n좋은 하루 되세요',
           style: TextStyle(
             fontSize: 16,
             color: Colors.white,
